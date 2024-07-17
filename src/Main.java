@@ -176,11 +176,11 @@ class admin {
         if (jeu.equalsIgnoreCase("FIFA") && (periode >= 120)) {
             price = price - ((price * 5) / 100);
         }
-        if (premierJoueur) {
-            price = price - ((price * 2) / 100);
+        if (premierJoueur==true) {
+            price = price - ( (price * 2) / 100);
         }
         if ((nomPost.equalsIgnoreCase("playstation")) && (nomEcran.equalsIgnoreCase("samsung")) && (periode >= 300)) {
-            price = price - ((price * 10) / 100);
+            price = price - ( (price * 10) / 100);
         }
         return price;
     }
@@ -251,7 +251,7 @@ class main {
             System.out.println("Saisir l'heure de debut: 09:00  ->  12:00  &  14:00  ->  18:00 ");
             String heureDebut = scanner.nextLine();
             LocalTime time1 = LocalTime.parse(heureDebut);
-            while (time1.isBefore(LocalTime.parse("09:00")) || time1.isAfter(LocalTime.parse("09:00")) || time1.isBefore(LocalTime.parse("14:00")) || time1.isAfter(LocalTime.parse("18:00") )){
+            while ( time1.isBefore(LocalTime.parse("09:00")) || time1.isAfter(LocalTime.parse("12:00")) &&  time1.isBefore(LocalTime.parse("14:00")) || time1.isAfter(LocalTime.parse("18:00") )){
                 System.out.println("Merci de choisir l'heure en respectant horaires d'ouverture : 09:00  ->  12:00  &  14:00  ->  18:00 ");
                 heureDebut = scanner.nextLine();
                 time1 = LocalTime.parse(heureDebut);
@@ -260,24 +260,31 @@ class main {
             System.out.println("Saisir une periode : \n 30 min , 60 min (1 heure) , 120 min (2 heures) , 300 min (5 heures) , 720 min (toute la journee)");
             int periode = scanner.nextInt();
             scanner.nextLine();
+            while ( periode!=30 && periode!=60 && periode!=120 && periode!=300 && periode!=720){
+                System.out.println("Cette periode n'est pas disponible ! veuillez saisir l'un de ces periodes : \n 30 min , 60 min (1 heure) , 120 min (2 heures) , 300 min (5 heures) , 720 min (toute la journee)");
+                periode = scanner.nextInt();
+                scanner.nextLine();
+            }
 
             System.out.println("saisir un jeu :");
             String jeu = scanner.nextLine();
+
             joueur joueur = new joueur(prenom, nom, nomPost, nomEcran, heureDebut, periode, jeu);
+            if (premierJoueur) {
+                joueur.setPremierJoueur(true);
+                premierJoueur = false;
+            }
+
             int prix = admin.tarifs(periode, jeu, joueur.getPremierJoueur(), nomPost, nomEcran);
             System.out.println("Veuillez payer le montant necessaire -> " + prix + " DH");
             int prixDonner = scanner.nextInt();
             scanner.nextLine();
-            System.out.println("Votre cote est : "+ joueur.getCodeJoueur());
             while (prixDonner != prix) {
                 System.out.println("Ce n'est pas le payemment veuillez faite attention !!");
                 prix = scanner.nextInt();
                 scanner.nextLine();
             }
-            if (premierJoueur) {
-                joueur.setPremierJoueur(true);
-                premierJoueur = false;
-            }
+            System.out.println("Votre cote est : "+ joueur.getCodeJoueur());
 
             //joueur.afficherCodeJoueur(joueur);
 
@@ -298,12 +305,12 @@ class main {
             }
             if (posteChoisi == null || ecranChoisi == null) {
                 admin.ajouterAuListeAttente(joueur, prixDonner);
-                System.out.println("Le poste est occupee vous serez ajouter a la liste d'attente, joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPost() + " et pour ecran " + joueur.getNomEcran() + " debut a l'heure " + joueur.getHeureDebut() + " pour une periode " + periode + "pour jeu " + joueur.getJeu() + "tel prix " + prix + " est ajouter a la liste d'attente!!");
+                System.out.println("Le poste est occupee vous serez ajouter a la liste d'attente, joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPost() + " et pour ecran " + joueur.getNomEcran() + " debut a l'heure " + joueur.getHeureDebut() + " pour une periode " + periode + " pour jeu " + joueur.getJeu() + " le prix = " + prix + " est ajouter a la liste d'attente!!");
             } else {
                 posteChoisi.setEtat(true);
                 ecranChoisi.setEtat(true);
                 admin.ajouterAuJoueur(joueur, prixDonner,posteChoisi,ecranChoisi);
-                System.out.println("joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPost() + " et pour ecran " + joueur.getNomEcran() + " debut a l'heure " + joueur.getHeureDebut() + " pour une periode " + periode + "pour jeu " + joueur.getJeu() + "tel prix " + prix + " est ajouter!!");
+                System.out.println("Le joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPost() + " et pour ecran " + joueur.getNomEcran() + " debut a l'heure " + joueur.getHeureDebut() + " pour une periode " + periode + " pour jeu " + joueur.getJeu() + " le prix " + prix + " est ajouter!!");
             }
 
             System.out.println("Ajouter un autre joueur oui ou non ?");
