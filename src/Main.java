@@ -122,7 +122,7 @@ class admin {
     double revenusJour;
     double revenusMois;
 
-    public void ajouterAuJoueur(joueur joueur, int prixDonner, poste poste,ecran ecran) {
+    public void ajouterAuJoueur(joueur joueur, double prixDonner, poste poste,ecran ecran) {
         if (listeJoueurs.size() < 9) {
             listeJoueurs.add(joueur);
             revenusJour = revenusJour + prixDonner;
@@ -131,7 +131,7 @@ class admin {
         }
     }
 
-    public void ajouterAuListeAttente(joueur joueur, int prixDonner) {
+    public void ajouterAuListeAttente(joueur joueur, double prixDonner) {
         if (listeAttenteJoueurs.size() < 8) {
             listeAttenteJoueurs.add(joueur);
             revenusJour = revenusJour + prixDonner;
@@ -151,8 +151,8 @@ class admin {
         return minutes * 60000;
     }
 
-    public int tarifs(int periode, String jeu, boolean premierJoueur, String nomPost, String nomEcran) {
-        int price;
+    public double tarifs(int periode, String jeu, boolean premierJoueur, String nomPost, String nomEcran) {
+        double price;
         switch (periode) {
             case 30:
                 price = 5;
@@ -173,14 +173,17 @@ class admin {
                 price = 0;
                 break;
         }
-        if (jeu.equalsIgnoreCase("FIFA") && (periode >= 120)) {
-            price = price - ((price * 5) / 100);
+        if ( (jeu.equalsIgnoreCase("FIFA")) && (periode >= 120) ) {
+            price *= 0.95;
+            return price;
         }
-        if (premierJoueur==true) {
-            price = price - ( (price * 2) / 100);
+        if (premierJoueur) {
+            price *= 0.98;
+            return price;
         }
         if ((nomPost.equalsIgnoreCase("playstation")) && (nomEcran.equalsIgnoreCase("samsung")) && (periode >= 300)) {
-            price = price - ( (price * 10) / 100);
+            price *= 0.90;
+            return price;
         }
         return price;
     }
@@ -237,7 +240,6 @@ class main {
                 nomPost = scanner.nextLine();
             }
 
-
             System.out.println("Saisir le nom de l'ecran \n 1. dell \n 2. hp \n 3. asus \n 4. samsung ");
             String nomEcran = scanner.nextLine();
             while (!(nomEcran.equalsIgnoreCase("dell") ||
@@ -270,23 +272,22 @@ class main {
             String jeu = scanner.nextLine();
 
             joueur joueur = new joueur(prenom, nom, nomPost, nomEcran, heureDebut, periode, jeu);
+
             if (premierJoueur) {
                 joueur.setPremierJoueur(true);
                 premierJoueur = false;
             }
 
-            int prix = admin.tarifs(periode, jeu, joueur.getPremierJoueur(), nomPost, nomEcran);
+            double prix = admin.tarifs(periode, jeu, joueur.getPremierJoueur(), nomPost, nomEcran);
             System.out.println("Veuillez payer le montant necessaire -> " + prix + " DH");
-            int prixDonner = scanner.nextInt();
+            double prixDonner = scanner.nextDouble();
             scanner.nextLine();
             while (prixDonner != prix) {
                 System.out.println("Ce n'est pas le payemment veuillez faite attention !!");
-                prix = scanner.nextInt();
+                prixDonner = scanner.nextDouble();
                 scanner.nextLine();
             }
             System.out.println("Votre cote est : "+ joueur.getCodeJoueur());
-
-            //joueur.afficherCodeJoueur(joueur);
 
             poste posteChoisi = null;
             for (poste poste : postes) {
@@ -318,7 +319,6 @@ class main {
             if (reponse.equalsIgnoreCase("non") ) {
                 break;
             }
-
 
         }
         admin.afficherRevenusJour();
