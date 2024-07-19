@@ -35,7 +35,7 @@ class GameSpace {
 
 
             for (int i = 0; i < postes.size(); i++) {
-                System.out.println((i + 1) + ". Poste: " + postes.get(i).getTypePoste() + ", Ecran: " + postes.get(i).getTypeEcran() + (postes.get(i).getEtat() ? " (occupé)" : " (libre)"));
+                System.out.println((i + 1) + ". Poste: " + postes.get(i).getTypePoste() + ", Ecran: " + postes.get(i).getTypeEcran() + (postes.get(i).getEtat() ? " (occupé) : prochaine disponibilité à : "+postes.get(i).reservations.getLast().endHour : " (libre)"));
             }
             System.out.print("Entrez le numéro du poste (1-9) -> ");
             int posteIndex = Integer.parseInt(scanner.nextLine()) - 1;
