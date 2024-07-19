@@ -3,11 +3,16 @@
 Project context :
 Le salon de jeux vidéo GameSpace souhaite gérer les clients qui viennent d’une manière progressive chaque jour GameSpace vous a demandé de créer un programme Java console qui facilite un peu le travail et encadrer organiser les horaires.
 Alors, pour faire réussir ce projet, vous devez principalement se focaliser sur ces grands points :
-\n • Le nombre des postes dans le salon est 9 postes, (4 Xbox, 3 PlayStation5, 2 Nintendo switch) pour les écrans (3 écrans Dell, 1 HP, 3 écrans Asus, 2 Samsung)
+• Le nombre des postes dans le salon est 9 postes, (4 Xbox, 3 PlayStation5, 2 Nintendo switch) pour les écrans (3 écrans Dell, 1 HP, 3 écrans Asus, 2 Samsung)
+
 • Les jeux sont classés par type, ex : (football : FIFA, PES…), (Guerre : Counter-Strike, Assassin's Creed)
+
 • Les horaires d’ouverture sont (09:00 - 12:00 et 14:00 – 20:00) et il utilise le principe (premier arrivé premier servi), du coup une fois les postes seront occupés, les autres peuvent rester dans la deuxième file d’attente.
+
 • La file d’attente a une capacité maximale de 8 places, du coup le max des joueurs dans le salon est 17.
+
 • Les joueurs peuvent choisir entre les horaires disponible (30 min / 1 heure / 2 heures / 5 heures / joueur de luxe (toute la journée)
+
 • Les tarifs sont (5DH – 10DH – 18DH – 40 DH – 65 DH)
 
 Workflow :
