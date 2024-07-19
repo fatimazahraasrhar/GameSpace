@@ -9,6 +9,7 @@ class GameSpace {
     public static final LocalTime closingHourAfternoon = LocalTime.of(20, 0);
 
     public static void main(String[] args) {
+        System.out.println("\n**********GameSpace**********\n");
         Scanner scanner = new Scanner(System.in);
         ArrayList<Poste> postes = new ArrayList<>();
 
