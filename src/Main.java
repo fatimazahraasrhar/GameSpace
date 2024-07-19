@@ -1,328 +1,127 @@
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
 import java.time.*;
+import java.util.*;
 
-class poste{
-    private String type;
-    private boolean etat;
-    public poste(String type){
-        this.type=type;
-        this.etat=false;
-    }
-    public String getType(){
-        return this.type;
-    }
-    public boolean getEtat(){
-        return this.etat;
-    }
-    public void setEtat(boolean etat){
-        this.etat=etat;
-    }
-    public void setType(String type){
-        this.type=type;
-    }
-}
-class ecran{
-    private String type;
-    private boolean etat;
-    public ecran(String type){
-        this.type=type;
-        this.etat=false; //false = not occupied / true = occupied
-    }
-    public String getType(){
-        return this.type;
-    }
-    public void setEtat(boolean etat){
-        this.etat=etat;
-    }
-    public void setType(String type){
-        this.type=type;
-    }
-    public boolean getEtat(){
-        return this.etat;
-    }
-}
-class joueur{
-    private String prenom;
-    private String nom;
-    private String nomPost;
-    private String nomEcran;
-    private String heureDebut;
-    private int periode;
-    private String jeu;
-    private String codeJoueur;
-    private boolean premierJoueur; // false = nest pas premier
-    public joueur(String prenom,String nom,String nomPost,String nomEcran,String heureDebut,int periode,String jeu){
-        this.prenom=prenom;
-        this.nom=nom;
-        this.nomPost=nomPost;
-        this.nomEcran=nomEcran;
-        this.heureDebut=heureDebut;
-        this.periode=periode;
-        this.jeu=jeu;
-        this.codeJoueur=UUID.randomUUID().toString();
-        this.premierJoueur=false;
-    }
-    public String getPrenom(){
-        return prenom;
-    }
-    public String getNom(){
-        return nom;
-    }
-    public String getNomPost(){
-        return nomPost;
-    }
-    public String getNomEcran(){
-        return nomEcran;
-    }
-    public String getHeureDebut(){
-        return heureDebut;
-    }
-    public int getPeriode(){
-        return periode;
-    }
-    public String getJeu(){
-        return jeu;
-    }
-    public String getCodeJoueur(){
-        return codeJoueur;
-    }
-    public boolean getPremierJoueur(){
-        return premierJoueur;
-    }
 
-    public void setPremierJoueur(boolean premierJoueur) {
-        this.premierJoueur = premierJoueur;
-    }
-}
-class MyTask extends TimerTask {
-    private joueur joueur;
-    private poste poste;
-    private ecran ecran;
-    public MyTask(joueur joueur,poste poste,ecran ecran) {
-        this.joueur = joueur;
-        this.poste = poste;
-        this.ecran = ecran;
-    }
-    public void run() {
-        System.out.println("Le temps est écoulé pour le joueur " + joueur.getPrenom() + " " + joueur.getNom() + ". Le poste va s'éteindre.");
-        poste.setEtat(false);
-        ecran.setEtat(false);
-        System.out.println("Le poste "+poste.getType()+" et l'ecran "+ecran.getType());
+class GameSpace {
+    public static final LocalTime openingHourMorning = LocalTime.of(9, 0);
+    public static final LocalTime closingHourMorning = LocalTime.of(12, 0);
+    public static final LocalTime openingHourAfternoon = LocalTime.of(14, 0);
+    public static final LocalTime closingHourAfternoon = LocalTime.of(20, 0);
 
-    }
-}
-
-class admin {
-    private ArrayList<joueur> listeJoueurs = new ArrayList<>();
-    private ArrayList<joueur> listeAttenteJoueurs = new ArrayList<>();
-    double revenusJour;
-    double revenusMois;
-
-    public void ajouterAuJoueur(joueur joueur, double prixDonner, poste poste,ecran ecran) {
-        if (listeJoueurs.size() < 9) {
-            listeJoueurs.add(joueur);
-            revenusJour = revenusJour + prixDonner;
-            revenusMois = revenusMois + prixDonner;
-            eteindrePoste(joueur,poste,ecran);
-        }
-    }
-
-    public void ajouterAuListeAttente(joueur joueur, double prixDonner) {
-        if (listeAttenteJoueurs.size() < 8) {
-            listeAttenteJoueurs.add(joueur);
-            revenusJour = revenusJour + prixDonner;
-            revenusMois = revenusMois + prixDonner;
-        } else {
-            System.out.println("le liste d'attente est pleine!!");
-        }
-    }
-
-    public void afficherRevenusJour() {System.out.println("Revenue du jour : " + revenusJour);}
-
-    public void afficherRevenusMois() {
-        System.out.println("Revenue du mois : " + revenusMois);
-    }
-
-    public int minutesToMilliseconds(int minutes) {
-        return minutes * 60000;
-    }
-
-    public double tarifs(int periode, String jeu, boolean premierJoueur, String nomPost, String nomEcran) {
-        double price;
-        switch (periode) {
-            case 30:
-                price = 5;
-                break;
-            case 60:
-                price = 10;
-                break;
-            case 120:
-                price = 18;
-                break;
-            case 300:
-                price = 40;
-                break;
-            case 720:
-                price = 65;
-                break;
-            default:
-                price = 0;
-                break;
-        }
-        if ( (jeu.equalsIgnoreCase("FIFA")) && (periode >= 120) ) {
-            price *= 0.95;
-            return price;
-        }
-        if (premierJoueur) {
-            price *= 0.98;
-            return price;
-        }
-        if ((nomPost.equalsIgnoreCase("playstation")) && (nomEcran.equalsIgnoreCase("samsung")) && (periode >= 300)) {
-            price *= 0.90;
-            return price;
-        }
-        return price;
-    }
-    public void eteindrePoste(joueur joueur,poste poste,ecran ecran) {
-        Timer timer = new Timer();
-        TimerTask task = new MyTask(joueur,poste,ecran);
-        timer.schedule(task, minutesToMilliseconds(joueur.getPeriode()));
-    }
-}
-class main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.println("Application game space : "); //application gamespace
-        ArrayList<poste> postes = new ArrayList<>();
-        postes.add(new poste("xbox"));
-        postes.add(new poste("xbox"));
-        postes.add(new poste("xbox"));
-        postes.add(new poste("xbox"));
-        postes.add(new poste("playstation"));
-        postes.add(new poste("playstation"));
-        postes.add(new poste("playstation"));
-        postes.add(new poste("Nintendo"));
-        postes.add(new poste("Nintendo"));
+        ArrayList<Poste> postes = new ArrayList<>();
 
-        ArrayList<ecran> ecrans = new ArrayList<>();
-        ecrans.add(new ecran("dell"));
-        ecrans.add(new ecran("dell"));
-        ecrans.add(new ecran("dell"));
-        ecrans.add(new ecran("hp"));
-        ecrans.add(new ecran("asus"));
-        ecrans.add(new ecran("asus"));
-        ecrans.add(new ecran("asus"));
-        ecrans.add(new ecran("samsung"));
-        ecrans.add(new ecran("samsung"));
+        // Initializing game postes
+        postes.add(new Poste("xbox", "dell"));
+        postes.add(new Poste("xbox", "dell"));
+        postes.add(new Poste("xbox", "dell"));
+        postes.add(new Poste("xbox", "hp"));
+        postes.add(new Poste("playstation", "asus"));
+        postes.add(new Poste("playstation", "asus"));
+        postes.add(new Poste("playstation", "asus"));
+        postes.add(new Poste("Nintendo", "samsung"));
+        postes.add(new Poste("Nintendo", "samsung"));
 
-        admin admin = new admin();
+        Admin admin = new Admin();
         boolean premierJoueur = true;
 
         while (true) {
-            System.out.println("Saisir un prenom : ");
+            System.out.print("Entrez votre prénom -> ");
             String prenom = scanner.nextLine();
 
-            System.out.println("Saisir un nom : ");
+            System.out.print("Entrez votre nom -> ");
             String nom = scanner.nextLine();
 
-            System.out.println("Saisir le nom du poste \n 1. xbox \n 2. playstation \n 3. nintendo switch ");
-            String nomPost = scanner.nextLine();
-            while (!(nomPost.equalsIgnoreCase("xbox") ||
-                    nomPost.equalsIgnoreCase("playstation") ||
-                    nomPost.equalsIgnoreCase("nintendo"))) {
-                System.out.println("Veuillez saisir l'un des postes (xbox, playstation, nintendo) :");
-                nomPost = scanner.nextLine();
+
+            for (int i = 0; i < postes.size(); i++) {
+                System.out.println((i + 1) + ". Poste: " + postes.get(i).getTypePoste() + ", Ecran: " + postes.get(i).getTypeEcran() + (postes.get(i).getEtat() ? " (occupé)" : " (libre)"));
+            }
+            System.out.print("Entrez le numéro du poste (1-9) -> ");
+            int posteIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+            if (posteIndex < 0 || posteIndex >= postes.size()) {
+                System.out.println("Numéro de poste invalide.");
+                continue;
             }
 
-            System.out.println("Saisir le nom de l'ecran \n 1. dell \n 2. hp \n 3. asus \n 4. samsung ");
-            String nomEcran = scanner.nextLine();
-            while (!(nomEcran.equalsIgnoreCase("dell") ||
-                    nomEcran.equalsIgnoreCase("hp") ||
-                    nomEcran.equalsIgnoreCase("asus") ||
-                    nomEcran.equalsIgnoreCase("samsung"))) {
-                System.out.println("Veuillez saisir l'un des ecrans (dell, hp, asus, samsung) :");
-                nomEcran = scanner.nextLine();
+            Poste posteChoisi = postes.get(posteIndex);
+
+            System.out.print("Les horaires d'ouverture : 09:00 -> 12:00 & 14:00 -> 18:00 \n Entrez l'heure de début (format HH:MM) -> ");
+            LocalTime heureDebut = LocalTime.parse(scanner.nextLine());
+            while (heureDebut.isBefore(LocalTime.parse("09:00")) || (heureDebut.isAfter(LocalTime.parse("12:00")) && heureDebut.isBefore(LocalTime.parse("14:00"))) || heureDebut.isAfter(LocalTime.parse("18:00"))) {
+                System.out.print("les horaires d'ouverture : 09:00 -> 12:00 & 14:00 -> 18:00 \n Merci de choisir l'heure en respectant les horaires->");
+                heureDebut = LocalTime.parse(scanner.nextLine());
             }
 
-            System.out.println("Saisir l'heure de debut: 09:00  ->  12:00  &  14:00  ->  18:00 ");
-            String heureDebut = scanner.nextLine();
-            LocalTime time1 = LocalTime.parse(heureDebut);
-            while ( time1.isBefore(LocalTime.parse("09:00")) || time1.isAfter(LocalTime.parse("12:00")) &&  time1.isBefore(LocalTime.parse("14:00")) || time1.isAfter(LocalTime.parse("18:00") )){
-                System.out.println("Merci de choisir l'heure en respectant horaires d'ouverture : 09:00  ->  12:00  &  14:00  ->  18:00 ");
-                heureDebut = scanner.nextLine();
-                time1 = LocalTime.parse(heureDebut);
+            System.out.print("Les periodes disponibles : 30 min , 60 min (1 heure) , 120 min (2 heures) , 300 min (5 heures) , 720 min (toute la journée) \n Entrez la durée de l'occupation en minutes -> ");
+            int periode = Integer.parseInt(scanner.nextLine());
+            while (periode != 30 && periode != 60 && periode != 120 && periode != 300 && periode != 720) {
+                System.out.print("Cette période n'est pas disponible ! \n Les periodes disponibles : 30 min , 60 min (1 heure) , 120 min (2 heures) , 300 min (5 heures) , 720 min (toute la journée) \n Veuillez saisir l'une de ces périodes -> ");
+                periode = Integer.parseInt(scanner.nextLine());
             }
 
-            System.out.println("Saisir une periode : \n 30 min , 60 min (1 heure) , 120 min (2 heures) , 300 min (5 heures) , 720 min (toute la journee)");
-            int periode = scanner.nextInt();
-            scanner.nextLine();
-            while ( periode!=30 && periode!=60 && periode!=120 && periode!=300 && periode!=720){
-                System.out.println("Cette periode n'est pas disponible ! veuillez saisir l'un de ces periodes : \n 30 min , 60 min (1 heure) , 120 min (2 heures) , 300 min (5 heures) , 720 min (toute la journee)");
-                periode = scanner.nextInt();
-                scanner.nextLine();
-            }
+            LocalTime heureFin = heureDebut.plusMinutes(periode);
 
-            System.out.println("saisir un jeu :");
-            String jeu = scanner.nextLine();
-
-            joueur joueur = new joueur(prenom, nom, nomPost, nomEcran, heureDebut, periode, jeu);
-
-            if (premierJoueur) {
-                joueur.setPremierJoueur(true);
-                premierJoueur = false;
-            }
-
-            double prix = admin.tarifs(periode, jeu, joueur.getPremierJoueur(), nomPost, nomEcran);
-            System.out.println("Veuillez payer le montant necessaire -> " + prix + " DH");
-            double prixDonner = scanner.nextDouble();
-            scanner.nextLine();
-            while (prixDonner != prix) {
-                System.out.println("Ce n'est pas le payemment veuillez faite attention !!");
-                prixDonner = scanner.nextDouble();
-                scanner.nextLine();
-            }
-            System.out.println("Votre cote est : "+ joueur.getCodeJoueur());
-
-            poste posteChoisi = null;
-            for (poste poste : postes) {
-                if ((poste.getType().equalsIgnoreCase(nomPost)) && !(poste.getEtat())) {
-                    posteChoisi = poste;
-                    break;
-                }
-            }
-
-            ecran ecranChoisi = null;
-            for (ecran ecran : ecrans) {
-                if (ecran.getType().equalsIgnoreCase(nomEcran) && !(ecran.getEtat())) {
-                    ecranChoisi = ecran;
-                    break;
-                }
-            }
-            if (posteChoisi == null || ecranChoisi == null) {
-                admin.ajouterAuListeAttente(joueur, prixDonner);
-                System.out.println("Le poste est occupee vous serez ajouter a la liste d'attente, joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPost() + " et pour ecran " + joueur.getNomEcran() + " debut a l'heure " + joueur.getHeureDebut() + " pour une periode " + periode + " pour jeu " + joueur.getJeu() + " le prix = " + prix + " est ajouter a la liste d'attente!!");
-            } else {
+            if (isWithinOperatingHours(heureDebut, heureFin) && posteChoisi.isAvailable(heureDebut, heureFin)) {
+                posteChoisi.addReservation(new Reservation(prenom + " " + nom, heureDebut, heureFin));
                 posteChoisi.setEtat(true);
-                ecranChoisi.setEtat(true);
-                admin.ajouterAuJoueur(joueur, prixDonner,posteChoisi,ecranChoisi);
-                System.out.println("Le joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPost() + " et pour ecran " + joueur.getNomEcran() + " debut a l'heure " + joueur.getHeureDebut() + " pour une periode " + periode + " pour jeu " + joueur.getJeu() + " le prix " + prix + " est ajouter!!");
+                System.out.println("Réservation réussie pour " + prenom + " " + nom + " au poste " + (posteIndex + 1));
+
+                System.out.println("Entrez le jeu auquel vous voulez jouer :");
+                String jeu = scanner.nextLine();
+
+                Joueur joueur = new Joueur(prenom, nom, posteChoisi.getTypePoste(), posteChoisi.getTypeEcran(), heureDebut, heureFin, periode, jeu);
+                admin.eteindrePoste(joueur, posteChoisi);
+                if (premierJoueur) {
+                    joueur.setPremierJoueur(true);
+                    premierJoueur = false;
+                }
+
+                double prix = admin.tarifs(periode, jeu, joueur.getPremierJoueur(), posteChoisi.getTypePoste(), posteChoisi.getTypeEcran());
+                System.out.println("Veuillez payer le montant nécessaire -> " + prix + " DH");
+                double prixDonner = scanner.nextDouble();
+                scanner.nextLine();
+                while (prixDonner != prix) {
+                    System.out.println("Ce n'est pas le paiement correct, veuillez faire attention !!");
+                    prixDonner = scanner.nextDouble();
+                    scanner.nextLine();
+                }
+                System.out.println("Votre code est : " + joueur.getCodeJoueur());
+
+                admin.calculRevenus(prixDonner, posteChoisi);
+                posteChoisi.addTojoueurList(prenom + " " + nom);
+                System.out.println("Le joueur " + joueur.getPrenom() + " " + joueur.getNom() + " pour poste " + joueur.getNomPoste() + " avec écran " + joueur.getNomEcran() + " début à l'heure " + joueur.getHeureDebut() + " pour une période de " + periode + " minutes pour jouer à " + joueur.getJeu() + ". Le prix " + prix + " est ajouté !!");
+            } else if ((heureFin.isAfter(closingHourMorning) && heureFin.isBefore(openingHourAfternoon)) || (heureFin.isAfter(closingHourAfternoon))) {
+                System.out.println("Cette reservation n'existe pas !!");
+            } else {
+                posteChoisi.addToWaitingList(prenom + " " + nom);
+                System.out.println("Le poste est déjà occupé. " + prenom + " " + nom + " a été ajouté à la liste d'attente.");
             }
 
             System.out.println("Ajouter un autre joueur oui ou non ?");
             String reponse = scanner.nextLine();
-            if (reponse.equalsIgnoreCase("non") ) {
+            if (reponse.equalsIgnoreCase("non")) {
                 break;
             }
-
         }
+
+        // Affichage de l'état des postes
+        System.out.println("État des postes :");
+        for (int i = 0; i < postes.size(); i++) {
+            Poste poste = postes.get(i);
+            String etat = poste.getEtat() ? "Occupé" : "Libre";
+            System.out.println((i + 1) + ". Poste: " + poste.getTypePoste() + ", Ecran: " + poste.getTypeEcran() + " - " + etat);
+        }
+
         admin.afficherRevenusJour();
         admin.afficherRevenusMois();
         scanner.close();
     }
+
+    private static boolean isWithinOperatingHours(LocalTime startHour, LocalTime endHour) {
+        return ((startHour.isAfter(openingHourMorning.minusMinutes(1)) && endHour.isBefore(closingHourMorning.plusMinutes(1))) ||
+                (startHour.isAfter(openingHourAfternoon.minusMinutes(1)) && endHour.isBefore(closingHourAfternoon.plusMinutes(1))));
+    }
+
 }
